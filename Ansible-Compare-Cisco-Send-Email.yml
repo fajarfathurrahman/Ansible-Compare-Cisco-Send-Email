@@ -1,0 +1,28 @@
+---
+### Config Compare Created by Fajar for IT Automation Case ###
+ - name: Compare Cisco Config with Python scritp and Send Email
+   hosts: local
+   gather_facts: no
+   connection: local
+   tasks:
+   - name: get timestamp
+     local_action: command date +%Y%m%d
+     register: timestamp
+     
+## https://github.com/fajarfathurrahman/Compare-with-diffios
+   - name: execute python script
+     command: /usr/bin/python /PATH/TO/FILE/compare-with-diffios.py
+     run_once: true
+
+   - name: sending email attachment
+     mail:
+       host: smtp.gmail.com
+       port: 465
+       secure: always
+       username: yourusername@gmail.com
+       password: yourpassword
+       to: recipient@host
+       subject: Ansible-report-{{ timestamp.stdout }} DO NOT REPLY! 
+       body: 'Anttention !! PFA \n DO NOT REPLY!'
+       attach: /PATH/TO/FILE/diff_{{ timestamp.stdout }}.txt
+     delegate_to: localhost
